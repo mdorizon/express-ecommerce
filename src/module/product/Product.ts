@@ -25,16 +25,6 @@ export class Product {
     }
 
 
-    update(title: string, description: string, price: number) {
-
-        this.validatePrice(price);
-        this.validateTitle(title);
-
-        this.title = title;
-        this.description = description;
-        this.price = price;
-    }
-
     private validateTitle(title: string) {
         if (title.length < 3) {
             throw new Error("titre trop court");
