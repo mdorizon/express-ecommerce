@@ -1,50 +1,55 @@
-import {Entity, Column, PrimaryGeneratedColumn} from "typeorm";
+import { Entity, Column, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
 export class Product {
+  @PrimaryGeneratedColumn()
+  public id: number;
 
-    @PrimaryGeneratedColumn()
-    public id: number;
+  @Column({ nullable: true, type: "float" })
+  public price: number;
 
-    @Column({nullable: true, type: "float"})
-    public price: number;
+  @Column({ type: "varchar", length: 255 })
+  public title: string;
 
-    @Column({type: "varchar", length: 255})
-    public title: string;
+  @Column({ type: "text", nullable: true })
+  public description: string;
 
-    @Column({type: "text", nullable: true})
-    public description: string;
+  constructor({
+    title,
+    description,
+    price,
+  }: {
+    title: string;
+    description: string;
+    price: number;
+  }) {
+    this.validatePrice(price);
+    this.validateTitle(title);
+    this.validateDescription(description);
+    this.title = title;
+    this.description = description;
+    this.price = price;
+  }
 
+  private validateTitle(title: string) {
+    if (title.length < 3) {
+      throw new Error("titre trop court");
+    }
+  }
 
-    constructor({title, description, price}: {title: string, description: string, price: number}) {
-        this.validatePrice(price);
-        this.validateTitle(title);
-        this.title = title;
-        this.description = description;
-        this.price = price;
+  private validateDescription(description: string) {
+    if (description.length < 6) {
+      throw new Error("la description doit faire au moins 6 caractères");
+    }
+  }
+
+  private validatePrice(price: number) {
+    if (price <= 0) {
+      throw new Error("le prix doit être supérieur à 0");
     }
 
-
-    private validateTitle(title: string) {
-        if (title.length < 3) {
-            throw new Error("titre trop court");
-        }
+    if (price > 10000) {
+      throw new Error("le prix doit être inférieur à 10000");
     }
-
-    private validatePrice(price: number) {
-        if (price <= 0) {
-            throw new Error("le prix doit être supérieur à 0");
-        }
-
-        if (price > 10000) {
-            throw new Error("le prix doit être inférieur à 10000");
-        }
-
-
-    }
-
-
-
-
-
+  }
 }
