@@ -23,7 +23,7 @@ class CreateOrderMockFailRepository implements CreateOrderRepository {
   }
 }
 
-describe("US-X : Créer une commande", () => {
+describe("US-3 : Créer une commande", () => {
   test("Scénario 1 : Créer une commande valide", async () => {
     // Étant donné qu'aucune commande n'existe
     const createOrderRepository = new CreateOrderDummyRepository();
@@ -88,19 +88,35 @@ describe("US-X : Créer une commande", () => {
     ).rejects.toThrow("La quantité doit être supérieure à 0");
   });
 
-  test("Scénario 5 : création échouée, échec de sauvegarde non prévue", async () => {
-    // Étant donné qu'il n'y a pas de commande enregistrée
-    const createOrderRepository = new CreateOrderMockFailRepository();
+  test("Scénario 5 : Supprimer l'ancienne commande à la création d'une nouvelle", async () => {
+    // Étant donné qu'une commande existe
+    let orderCount = 0;
+    const createOrderRepository: CreateOrderRepository = {
+      async save(_order: Order): Promise<void> {
+        orderCount++;
+      },
+      async deleteAll(): Promise<void> {
+        orderCount = 0;
+      },
+    };
     const createOrderUseCase = new CreateOrderUseCase(createOrderRepository);
 
-    await expect(
-      // Quand je crée une commande et que la sauvegarde échoue
-      createOrderUseCase.execute({
-        productId: 1,
-        quantity: 2,
-        priceAtOrderTime: 50,
-      })
-      // Alors une erreur doit être envoyée «erreur lors de la création de la commande»
-    ).rejects.toThrow("erreur lors de la création de la commande");
+    // Création de la première commande
+    await createOrderUseCase.execute({
+      productId: 1,
+      quantity: 2,
+      priceAtOrderTime: 50,
+    });
+    expect(orderCount).toBe(1);
+
+    // Quand l'utilisateur crée une nouvelle commande
+    await createOrderUseCase.execute({
+      productId: 2,
+      quantity: 1,
+      priceAtOrderTime: 30,
+    });
+
+    // Alors seule la nouvelle commande existe
+    expect(orderCount).toBe(1);
   });
 });
