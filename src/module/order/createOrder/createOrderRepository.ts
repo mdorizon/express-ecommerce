@@ -1,6 +1,6 @@
-import {Order} from "../Order";
+import { Order } from "../Order";
 
 export interface CreateOrderRepository {
-    save(order: Order): Promise<void>;
-    deleteAll(): Promise<void>;
+  save(order: Order): Promise<void>;
+  deleteAll(): Promise<void>;
 }
